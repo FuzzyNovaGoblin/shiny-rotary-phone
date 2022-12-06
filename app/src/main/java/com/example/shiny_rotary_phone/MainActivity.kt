@@ -3,9 +3,11 @@ package com.example.shiny_rotary_phone
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shiny_rotary_phone.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
@@ -14,11 +16,13 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val key = "2cd8f552-3fa3-455d-b48f-1eb986db380c"
         val name = "julien.marcuse@mymail.champlain.edu"
-        binding.chat.adapter = ChatAdapter(ChitChatAPI(key, name))
+        val adapter = ChatAdapter(ChitChatAPI(key, name))
+        binding.chat.adapter = adapter
+        binding.chat.layoutManager = LinearLayoutManager(this)
     }
 }
 
@@ -57,7 +61,6 @@ class ChatAdapter(val api: ChitChatAPI): RecyclerView.Adapter<ChatMessage>() {
     override fun onBindViewHolder(holder: ChatMessage, position: Int) {
         holder.bind(getMessage(position))
     }
-
-    override fun getItemCount() = messages.count()
+    override fun getItemCount() = messages.count() + 1
 
 }
