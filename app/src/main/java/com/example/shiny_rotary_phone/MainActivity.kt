@@ -1,5 +1,6 @@
 package com.example.shiny_rotary_phone
 
+import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -24,8 +25,8 @@ class MainActivity : AppCompatActivity() {
         val key = "2cd8f552-3fa3-455d-b48f-1eb986db380c"
         val name = "julien.marcuse@mymail.champlain.edu"
         val api = ChitChatAPI(key, name, this)
-        Log.i("blah", api.retrieveMessages().toString())
-        val adapter = ChatAdapter(ChitChatAPI(key, name, this))
+        val messages = MessageRepository(api)
+        val adapter = ChatAdapter(messages) {runOnUiThread(it)}
         binding.chat.adapter = adapter
         binding.chat.layoutManager = LinearLayoutManager(this)
     }
@@ -35,9 +36,11 @@ class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
 
     fun reset() {
         view.removeAllViews()
+        view.minimumHeight = 1
     }
 
     fun bind(message: Message) {
+        view.removeAllViews()
         view.orientation = LinearLayout.VERTICAL
         val username = TextView(view.context).apply {text = message.sender; setTextColor(Color.LTGRAY)}
         val msg = TextView(view.context).apply {text = message.content}
@@ -47,35 +50,19 @@ class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
 
 }
 
-class ChatAdapter(val api: ChitChatAPI): RecyclerView.Adapter<ChatMessage>() {
-
-    val messages = HashMap<Int, Message>()
+class ChatAdapter(val cache: MessageRepository, val runner: (() -> Unit) -> Unit): RecyclerView.Adapter<ChatMessage>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessage {
         return ChatMessage(LinearLayout(parent.context))
     }
 
-    fun getMessage(pos: Int, callback: (Message) -> Unit) {
-        if (messages.containsKey(pos)) {
-            callback(messages[pos]!!)
-            return
-        }
-        api.retrieveMessages(pos).also {
-            if (it.isEmpty()) {
-                return@also
-            }
-            callback(it[0])
-            it.forEachIndexed { index, entry -> messages[index + pos] = entry }
-        }
-    }
-
-    fun clearCache() = messages.clear()
-
     override fun onBindViewHolder(holder: ChatMessage, position: Int) {
         holder.reset()
-        getMessage(position, holder::bind)
+        cache.getMessage(position) {
+            runner {holder.bind(it)}
+        }
     }
 
-    override fun getItemCount() = 10000
+    override fun getItemCount() = cache.cacheSize() + 10
 
 }
