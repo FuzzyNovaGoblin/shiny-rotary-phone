@@ -18,13 +18,14 @@ import javax.net.ssl.HttpsURLConnection
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        sendRequest("https://google.com") {Log.i("blah", it)}
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val key = "2cd8f552-3fa3-455d-b48f-1eb986db380c"
         val name = "julien.marcuse@mymail.champlain.edu"
-        val adapter = ChatAdapter(ChitChatAPI(key, name))
+        val api = ChitChatAPI(key, name, this)
+        Log.i("blah", api.retrieveMessages().toString())
+        val adapter = ChatAdapter(ChitChatAPI(key, name, this))
         binding.chat.adapter = adapter
         binding.chat.layoutManager = LinearLayoutManager(this)
     }
@@ -32,8 +33,11 @@ class MainActivity : AppCompatActivity() {
 
 class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
 
-    fun bind(message: Message) {
+    fun reset() {
         view.removeAllViews()
+    }
+
+    fun bind(message: Message) {
         view.orientation = LinearLayout.VERTICAL
         val username = TextView(view.context).apply {text = message.sender; setTextColor(Color.LTGRAY)}
         val msg = TextView(view.context).apply {text = message.content}
@@ -45,26 +49,33 @@ class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
 
 class ChatAdapter(val api: ChitChatAPI): RecyclerView.Adapter<ChatMessage>() {
 
-    val messages = TreeMap<Int, Message>()
+    val messages = HashMap<Int, Message>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessage {
         return ChatMessage(LinearLayout(parent.context))
     }
 
-    fun getMessage(pos: Int): Message {
+    fun getMessage(pos: Int, callback: (Message) -> Unit) {
         if (messages.containsKey(pos)) {
-            return messages[pos]!!
+            callback(messages[pos]!!)
+            return
         }
-        val offset = if (messages.isEmpty()) 0 else messages.firstKey()
-        api.retrieveMessages(pos - offset).forEachIndexed { index, item ->
-            messages.put(index + offset, item)
+        api.retrieveMessages(pos).also {
+            if (it.isEmpty()) {
+                return@also
+            }
+            callback(it[0])
+            it.forEachIndexed { index, entry -> messages[index + pos] = entry }
         }
-        return messages[pos]!!
     }
 
+    fun clearCache() = messages.clear()
+
     override fun onBindViewHolder(holder: ChatMessage, position: Int) {
-        holder.bind(getMessage(position))
+        holder.reset()
+        getMessage(position, holder::bind)
     }
-    override fun getItemCount() = messages.count() + 1
+
+    override fun getItemCount() = 10000
 
 }
