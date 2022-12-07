@@ -37,7 +37,7 @@ class MessageRepository(val api: ChitChatAPI) {
                 callback(it)
                 return@doAsync
             }
-            api.retrieveMessages(pos).forEachIndexed {index, elem -> cache[pos + index] = elem}
+            api.retrieveMessages(pos, 100).forEachIndexed {index, elem -> cache[pos + index] = elem}
             cache[pos]?.let(callback)
         }
     }

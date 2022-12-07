@@ -36,7 +36,7 @@ class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
 
     fun reset() {
         view.removeAllViews()
-        view.minimumHeight = 1
+        view.minimumHeight = 10
     }
 
     fun bind(message: Message) {
@@ -53,6 +53,7 @@ class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
 class ChatAdapter(val cache: MessageRepository, val runner: (() -> Unit) -> Unit): RecyclerView.Adapter<ChatMessage>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessage {
+        Log.i("blah", viewType.toString())
         return ChatMessage(LinearLayout(parent.context))
     }
 
