@@ -3,9 +3,11 @@ package com.example.shiny_rotary_phone
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Space
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,8 +38,14 @@ class ChatMessage(val cache: MessageRepository, val view: LinearLayout): Recycle
 
     fun bind(message: Message) {
         view.removeAllViews()
+        view.showDividers = LinearLayout.SHOW_DIVIDER_END
         view.orientation = LinearLayout.VERTICAL
-        val username = TextView(view.context).apply {text = message.sender; setTextColor(Color.LTGRAY)}
+        val header = LinearLayout(view.context).apply {orientation = LinearLayout.HORIZONTAL}
+        val username = TextView(view.context).apply {text = message.sender.split("@")[0] + "  "}
+        username.setTextColor(Color.LTGRAY)
+        val date = TextView(view.context).apply {text = message.date}
+        date.gravity = Gravity.END
+        date.textAlignment = TextView.TEXT_ALIGNMENT_VIEW_END
         val msg = TextView(view.context).apply {text = message.content}
         val likes = LinearLayout(view.context).apply {orientation = LinearLayout.HORIZONTAL}
         val likeButton = Button(view.context).apply {text = "${message.likes} Likes"}
@@ -52,9 +60,11 @@ class ChatMessage(val cache: MessageRepository, val view: LinearLayout): Recycle
             message.dislikes += 1
             dislikeButton.text = "${message.dislikes} Dislikes"
         }
+        header.addView(username)
+        header.addView(date)
         likes.addView(likeButton)
         likes.addView(dislikeButton)
-        view.addView(username)
+        view.addView(header)
         view.addView(msg)
         view.addView(likes)
     }
@@ -64,7 +74,6 @@ class ChatMessage(val cache: MessageRepository, val view: LinearLayout): Recycle
 class ChatAdapter(val cache: MessageRepository, val runner: (() -> Unit) -> Unit): RecyclerView.Adapter<ChatMessage>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessage {
-        Log.i("blah", viewType.toString())
         return ChatMessage(cache, LinearLayout(parent.context))
     }
 

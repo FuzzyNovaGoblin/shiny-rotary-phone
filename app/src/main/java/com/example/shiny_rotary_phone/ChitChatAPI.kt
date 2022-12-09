@@ -28,6 +28,7 @@ class ChitChatAPI(val key: String, val email: String) {
         // Instantiate the RequestQueue.
         val url = "https://www.stepoutnyc.com/chitchat?key=${key}&client=${email}&skip=${skip}&limit=${limit}"
         val contents = sendRequest(url)
+        Log.i("blah", contents)
         val array = JSONObject(contents).getJSONArray("messages")
         val messages = mutableListOf<Message>()
         for (i in 0 until array.length()) {
@@ -37,7 +38,8 @@ class ChitChatAPI(val key: String, val email: String) {
             val likes = obj.getInt("likes")
             val dislikes = obj.getInt("dislikes")
             val message = obj.getString("message")
-            messages.add(Message(id, message, author, likes, dislikes))
+            val date = obj.getString("date")
+            messages.add(Message(id, message, author, date, likes, dislikes))
         }
         return messages
     }
