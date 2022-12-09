@@ -72,14 +72,20 @@ class ChatMessage(val cache: MessageRepository, val view: LinearLayout): Recycle
         val likeButton = Button(view.context).apply {text = "${message.likes} Likes"}
         val dislikeButton = Button(view.context).apply {text = "${message.dislikes} Dislikes"}
         likeButton.setOnClickListener {
-            cache.api.likeMessage(message)
-            message.likes += 1
-            likeButton.text = "${message.likes} Likes"
+            if (!message.liked) {
+                message.liked = true
+                message.likes += 1
+                cache.api.likeMessage(message)
+                likeButton.text = "${message.likes} Likes"
+            }
         }
         dislikeButton.setOnClickListener {
-            cache.api.dislikeMessage(message)
-            message.dislikes += 1
-            dislikeButton.text = "${message.dislikes} Dislikes"
+            if (!message.disliked) {
+                message.disliked = true
+                message.dislikes += 1
+                cache.api.dislikeMessage(message)
+                dislikeButton.text = "${message.dislikes} Dislikes"
+            }
         }
         header.addView(username)
         header.addView(date)
