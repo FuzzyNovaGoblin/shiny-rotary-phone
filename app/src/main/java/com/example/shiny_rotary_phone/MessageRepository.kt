@@ -21,6 +21,14 @@ class MessageRepository(val api: ChitChatAPI) {
         thread?.start()
     }
 
+    fun push() {
+        queue.clear()
+        cache.keys.sortedDescending().forEach {
+            cache[it + 1] = cache[it]!!
+        }
+        cache.remove(0)
+    }
+
     fun clearCache() = cache.clear()
 
     private fun doAsync(pos: Int, callback: () -> Unit) {

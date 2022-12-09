@@ -19,7 +19,6 @@ fun sendRequest(dest: String): String {
     return contents
 }
 fun postRequest(dest: String, contents : String){
-    Log.i("here", "in post")
     val thread = Thread {
         val url = URL(dest)
         val conn = url.openConnection() as HttpsURLConnection

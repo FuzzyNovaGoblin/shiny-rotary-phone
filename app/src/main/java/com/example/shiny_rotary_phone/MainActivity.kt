@@ -30,8 +30,6 @@ class MainActivity : AppCompatActivity() {
         binding.chat.layoutManager = LinearLayoutManager(this)
 
         binding.newMsgButton.setOnClickListener {
-            Log.i("here", "in on click listener")
-
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
             val input: EditText = EditText(this);
             input.hint = "Your message here"
@@ -39,13 +37,13 @@ class MainActivity : AppCompatActivity() {
             builder.setPositiveButton(
                 "Send"
             ) { _, _ ->
-                Log.i("here", "in send button")
                 api.sendMessage(input.text.toString())
+                adapter.cache.push()
+                adapter.notifyDataSetChanged()
             }
             builder.setNegativeButton(
                 "Cancel"
             ) { dialog, _ ->
-                Log.i("here", "in cancel button")
                 dialog.cancel() }
             builder.show()
         }
