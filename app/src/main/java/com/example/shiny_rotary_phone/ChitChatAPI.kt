@@ -47,7 +47,7 @@ class ChitChatAPI(val key: String, val email: String) {
         val contents = sendRequest(url)
     }
     fun dislikeMessage(message:Message) {
-        val url ="https://www.stepoutnyc.com/dislike/like/${message.id}?key=${key}&client=${email}"
+        val url ="https://www.stepoutnyc.com/chitchat/dislike/${message.id}?key=${key}&client=${email}"
         val contents = sendRequest(url)
     }
 

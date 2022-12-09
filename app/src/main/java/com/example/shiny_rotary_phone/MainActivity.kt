@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
+class ChatMessage(val cache: MessageRepository, val view: LinearLayout): RecyclerView.ViewHolder(view) {
 
     fun reset() {
         view.removeAllViews()
@@ -42,6 +42,16 @@ class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
         val likes = LinearLayout(view.context).apply {orientation = LinearLayout.HORIZONTAL}
         val likeButton = Button(view.context).apply {text = "${message.likes} Likes"}
         val dislikeButton = Button(view.context).apply {text = "${message.dislikes} Dislikes"}
+        likeButton.setOnClickListener {
+            cache.api.likeMessage(message)
+            message.likes += 1
+            likeButton.text = "${message.likes} Likes"
+        }
+        dislikeButton.setOnClickListener {
+            cache.api.dislikeMessage(message)
+            message.dislikes += 1
+            dislikeButton.text = "${message.dislikes} Dislikes"
+        }
         likes.addView(likeButton)
         likes.addView(dislikeButton)
         view.addView(username)
@@ -55,7 +65,7 @@ class ChatAdapter(val cache: MessageRepository, val runner: (() -> Unit) -> Unit
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessage {
         Log.i("blah", viewType.toString())
-        return ChatMessage(LinearLayout(parent.context))
+        return ChatMessage(cache, LinearLayout(parent.context))
     }
 
     override fun onBindViewHolder(holder: ChatMessage, position: Int) {
