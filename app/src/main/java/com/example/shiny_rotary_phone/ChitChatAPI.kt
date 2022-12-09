@@ -24,10 +24,7 @@ fun postRequest(dest: String, contents : String){
         val url = URL(dest)
         val conn = url.openConnection() as HttpsURLConnection
         conn.requestMethod = "POST";
-        val output = DataOutputStream(conn.outputStream)
-        output.writeBytes(contents)
-        output.close()
-        conn.disconnect()
+        conn.inputStream.readBytes()
     }
     thread.start()
     thread.join()
@@ -66,7 +63,7 @@ class ChitChatAPI(val key: String, val email: String) {
 
     fun sendMessage(message:String) {
         Log.i("here", "in send msg")
-        val url ="https://www.stepoutnyc.com/chitchat?key=${key}&client=${email}"
+        val url ="https://www.stepoutnyc.com/chitchat?key=${key}&client=${email}&message=${message}"
         postRequest(url, message)
     }
 
