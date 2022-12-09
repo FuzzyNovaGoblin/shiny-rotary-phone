@@ -1,6 +1,5 @@
 package com.example.shiny_rotary_phone
 
-import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -23,7 +22,7 @@ fun sendRequest(dest: String): String {
     return contents
 }
 
-class ChitChatAPI(val key: String, val email: String, val context: Context) {
+class ChitChatAPI(val key: String, val email: String) {
 
     fun retrieveMessages(skip: Int = 0, limit: Int = 20): List<Message> {
         // Instantiate the RequestQueue.
@@ -41,6 +40,15 @@ class ChitChatAPI(val key: String, val email: String, val context: Context) {
             messages.add(Message(id, message, author, likes, dislikes))
         }
         return messages
+    }
+
+    fun likeMessage(message:Message) {
+        val url ="https://www.stepoutnyc.com/chitchat/like/${message.id}?key=${key}&client=${email}"
+        val contents = sendRequest(url)
+    }
+    fun dislikeMessage(message:Message) {
+        val url ="https://www.stepoutnyc.com/dislike/like/${message.id}?key=${key}&client=${email}"
+        val contents = sendRequest(url)
     }
 
 }

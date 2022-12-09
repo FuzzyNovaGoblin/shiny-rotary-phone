@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val key = "2cd8f552-3fa3-455d-b48f-1eb986db380c"
         val name = "julien.marcuse@mymail.champlain.edu"
-        val api = ChitChatAPI(key, name, this)
+        val api = ChitChatAPI(key, name)
         val messages = MessageRepository(api)
         val adapter = ChatAdapter(messages) {runOnUiThread(it)}
         binding.chat.adapter = adapter
