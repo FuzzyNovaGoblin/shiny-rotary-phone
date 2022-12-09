@@ -6,9 +6,11 @@ import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +28,27 @@ class MainActivity : AppCompatActivity() {
         val adapter = ChatAdapter(messages) {runOnUiThread(it)}
         binding.chat.adapter = adapter
         binding.chat.layoutManager = LinearLayoutManager(this)
+
+        binding.newMsgButton.setOnClickListener {
+            Log.i("here", "in on click listener")
+
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            val input: EditText = EditText(this);
+            input.hint = "Your message here"
+            builder.setView(input)
+            builder.setPositiveButton(
+                "Send"
+            ) { _, _ ->
+                Log.i("here", "in send button")
+                api.sendMessage(input.text.toString())
+            }
+            builder.setNegativeButton(
+                "Cancel"
+            ) { dialog, _ ->
+                Log.i("here", "in cancel button")
+                dialog.cancel() }
+            builder.show()
+        }
     }
 }
 

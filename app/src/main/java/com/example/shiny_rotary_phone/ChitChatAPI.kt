@@ -1,12 +1,9 @@
 package com.example.shiny_rotary_phone
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import org.json.JSONObject
-import java.net.HttpURLConnection
+import java.io.DataOutputStream
 import java.net.URL
-import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 
 fun sendRequest(dest: String): String {
@@ -20,6 +17,20 @@ fun sendRequest(dest: String): String {
     thread.start()
     thread.join()
     return contents
+}
+fun postRequest(dest: String, contents : String){
+    Log.i("here", "in post")
+    val thread = Thread {
+        val url = URL(dest)
+        val conn = url.openConnection() as HttpsURLConnection
+        conn.requestMethod = "POST";
+        val output = DataOutputStream(conn.outputStream)
+        output.writeBytes(contents)
+        output.close()
+        conn.disconnect()
+    }
+    thread.start()
+    thread.join()
 }
 
 class ChitChatAPI(val key: String, val email: String) {
@@ -46,11 +57,17 @@ class ChitChatAPI(val key: String, val email: String) {
 
     fun likeMessage(message:Message) {
         val url ="https://www.stepoutnyc.com/chitchat/like/${message.id}?key=${key}&client=${email}"
-        val contents = sendRequest(url)
+        sendRequest(url)
     }
     fun dislikeMessage(message:Message) {
         val url ="https://www.stepoutnyc.com/chitchat/dislike/${message.id}?key=${key}&client=${email}"
-        val contents = sendRequest(url)
+        sendRequest(url)
+    }
+
+    fun sendMessage(message:String) {
+        Log.i("here", "in send msg")
+        val url ="https://www.stepoutnyc.com/chitchat?key=${key}&client=${email}"
+        postRequest(url, message)
     }
 
 }
