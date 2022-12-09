@@ -4,23 +4,29 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.Space
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shiny_rotary_phone.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.myAppbar)
+        binding.myAppbar.showOverflowMenu()
+        binding.myAppbar.showContextMenu()
         val key = "2cd8f552-3fa3-455d-b48f-1eb986db380c"
         val name = "julien.marcuse@mymail.champlain.edu"
         val api = ChitChatAPI(key, name)
@@ -28,6 +34,12 @@ class MainActivity : AppCompatActivity() {
         val adapter = ChatAdapter(messages) {runOnUiThread(it)}
         binding.chat.adapter = adapter
         binding.chat.layoutManager = LinearLayoutManager(this)
+        Log.i("here", "children "+binding.myAppbar.menu.children.count())
+        Log.i("here", "children item id "+binding.myAppbar.menu.children.first().itemId)
+        Log.i("here", "children resource "+ R.id.sync_button)
+        Log.i("here", "children "+binding.myAppbar.menu.children.toString())
+
+
 
         binding.newMsgButton.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
@@ -48,7 +60,23 @@ class MainActivity : AppCompatActivity() {
             builder.show()
         }
     }
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.appbar_options, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when(item.itemId){
+        R.id.sync_button -> {
+            Log.i("here", "run sync")
+            true
+        }
+        else -> {
+            Log.i("here", "run other")
+            super.onOptionsItemSelected(item)
+        }
+    }
 }
+
 
 class ChatMessage(val cache: MessageRepository, val view: LinearLayout): RecyclerView.ViewHolder(view) {
 
