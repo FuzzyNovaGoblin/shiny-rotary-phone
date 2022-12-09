@@ -20,9 +20,12 @@ import com.example.shiny_rotary_phone.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: ChatAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.myAppbar)
         binding.myAppbar.showOverflowMenu()
@@ -31,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         val name = "julien.marcuse@mymail.champlain.edu"
         val api = ChitChatAPI(key, name)
         val messages = MessageRepository(api)
-        val adapter = ChatAdapter(messages) {runOnUiThread(it)}
+        adapter = ChatAdapter(messages) {runOnUiThread(it)}
         binding.chat.adapter = adapter
         binding.chat.layoutManager = LinearLayoutManager(this)
         Log.i("here", "children "+binding.myAppbar.menu.children.count())
@@ -67,11 +70,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when(item.itemId){
         R.id.sync_button -> {
-            Log.i("here", "run sync")
+            adapter.cache.clearCache()
+            adapter.notifyDataSetChanged()
             true
         }
         else -> {
-            Log.i("here", "run other")
             super.onOptionsItemSelected(item)
         }
     }
