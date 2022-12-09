@@ -1,21 +1,16 @@
 package com.example.shiny_rotary_phone
 
-import android.content.Context
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.shiny_rotary_phone.databinding.ActivityMainBinding
-import java.net.HttpURLConnection
-import java.net.URL
-import java.text.SimpleDateFormat
-import java.util.*
-import javax.net.ssl.HttpsURLConnection
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,8 +39,14 @@ class ChatMessage(val view: LinearLayout): RecyclerView.ViewHolder(view) {
         view.orientation = LinearLayout.VERTICAL
         val username = TextView(view.context).apply {text = message.sender; setTextColor(Color.LTGRAY)}
         val msg = TextView(view.context).apply {text = message.content}
+        val likes = LinearLayout(view.context).apply {orientation = LinearLayout.HORIZONTAL}
+        val likeButton = Button(view.context).apply {text = "${message.likes} Likes"}
+        val dislikeButton = Button(view.context).apply {text = "${message.dislikes} Dislikes"}
+        likes.addView(likeButton)
+        likes.addView(dislikeButton)
         view.addView(username)
         view.addView(msg)
+        view.addView(likes)
     }
 
 }
